@@ -55,9 +55,19 @@
     links.forEach(link => {
       const href = link.getAttribute("href");
 
-      // Só aplica em links relativos (ou seja, dentro do site)
-      if (href.startsWith("/") || href.startsWith(window.location.origin)) {
-        const url = new URL(href, window.location.origin);
+      // Aplica em links relativos (dentro do site) OU links de checkout externos
+      if (
+        href.startsWith("/") ||
+        href.startsWith(window.location.origin) ||
+        href.includes("checkout.geterectus.site")
+      ) {
+        let url;
+        try {
+          url = new URL(href, window.location.origin);
+        } catch (e) {
+          // Se não for um URL válido, ignora
+          return;
+        }
         const linkParams = new URLSearchParams(url.search);
 
         // Adiciona os parâmetros desejados
@@ -66,7 +76,7 @@
         }
 
         url.search = linkParams.toString();
-        link.setAttribute("href", url.pathname + url.search);
+        link.setAttribute("href", url.origin + url.pathname + url.search);
       }
     });
   }
